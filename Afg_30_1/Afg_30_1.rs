@@ -11,10 +11,16 @@ Berechnung von:
 -Minimum + Index
 -Index des Elementes mit der Größten Abweichung.
 -Standartabweichung
-
 */
 
+use std::rand;
+use std::rand::Rng;
+
 fn main() {
+    let mut array = [0.0;100];  //Arraydeklaration mit 100 Feldern mit dem Inhalt 0 [Datentyp;Anzahl]
+                                //Alternative: Listendeklaration [0,1,2,3,4,5,7...]
 
-
+    for x in array.iter(){
+        print!("{} ", x);
+    }
 }
