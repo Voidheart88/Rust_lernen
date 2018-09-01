@@ -46,8 +46,6 @@ fn main() {
     average /= 100.0; //sollte gegen 0.5 gehen
     for i in 0..array.len(){
         let x = array[i] - average;
-
-        if x.abs() > average
     }
     println!("Maximum im Array: {}", rand_max );
     println!("Minimum im Array: {}", rand_min );
