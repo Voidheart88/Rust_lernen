@@ -1,10 +1,6 @@
 /*
 Aufgabenstellung:
-Array mit 100 Float Zahlen erstellen.
-Arrayzugriff auf 3 Arten:
--Indizes x[i]
--Berechnete Zeiger *(x+i)
--Inkrementierter Zeiger x++
+Array mit 1000 Float Zahlen erstellen.
 Berechnung von:
 -Maximum
 -Minimum
@@ -19,7 +15,7 @@ use std::f32;                       //für minimal und Maximalwerte von Gleitkom
 
 fn main() {
     let rng = rand::thread_rng();           //Erstelle eine Instanz des Zufallszahlengenerators
-    let mut array : [f32;100] = [0.0;100];  //Arraydeklaration mit 100 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
+    let mut array : [f32;1000] = [0.0;1000];  //Arraydeklaration mit 100 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
                                             //Alternative: Listendeklaration [0,1,2,3,4,5,7...] (wäre nur etwas anstrengend) 
                                             //TODO herausfinden ob man das Array direkt mit Zufallszahlen initialisieren kann
     let mut rand_max: f32=f32::MIN;             //Enthält den Maximalwert im Array -initialisiert als Minimum von f32
@@ -43,7 +39,7 @@ fn main() {
         if rand_min > array[i] {rand_min = array[i];}
         average += array[i];
     }
-    average /= 100.0; //sollte gegen 0.5 gehen
+    average /= 1000.0; //sollte gegen 0.5 gehen
     for i in 0..array.len(){
         let x = array[i] - average;
     }
