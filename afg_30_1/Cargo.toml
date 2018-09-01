@@ -1,0 +1,7 @@
+[package]
+name = "afg_30_1"
+version = "0.1.0"
+authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
+
+[dependencies]
+rand = "0.5.5"
