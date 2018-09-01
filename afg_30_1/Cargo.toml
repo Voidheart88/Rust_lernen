@@ -5,3 +5,4 @@ authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
 
 [dependencies]
 rand = "0.5.5"
+rayon = "1.0"
