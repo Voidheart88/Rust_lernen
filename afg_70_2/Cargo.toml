@@ -1,0 +1,6 @@
+[package]
+name = "afg_70_2"
+version = "0.1.0"
+authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
+
+[dependencies]
