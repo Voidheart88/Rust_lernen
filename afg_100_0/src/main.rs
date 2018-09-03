@@ -29,6 +29,11 @@ States:
 5 - Ende, Schließe die geöffnete Datei, gib alle alloziierten zeiger frei
 */
 
+use std::io;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::fs::File;
+
 //Zustandsautomat:
 
 //Zustände
@@ -44,8 +49,19 @@ enum States {
 //Zustandsaufrufe
 
 //Startzustand, Lade die Datenbank und gehe über in den Menuzustand 
-fn fsm_sstart(current_state:&mut States){
+fn fsm_sstart(current_state:&mut States, data_string:&mut String){
     println!("Start");
+    println!("Lade Datenbank");    
+    let mut file = File::open("Datenbank.db");
+    if file.is_err() {
+        println!("Fehler - Datei nicht vorhanden, erstelle Datei");
+        file = File::create("Datenbank.db");
+        file = File::open("Datenbank.db");
+    }
+    else {
+        println!("Datei vorhanden");        
+    }
+    
     *current_state = States::SMenu;
 }
 //Menuzustand, Warte auf Eingabe vom Nutzer und Wechsle abhängig von Eingabe in 2(Eingabe),3(Ausgabe),4(Änderung),5(Ende)
@@ -74,13 +90,13 @@ fn fsm_sfin(){
     println!("Ende"); 
 }
 
-//Zustandsautomat
-fn fsm (){
+fn main() {
     let mut current_state: States = States::SStart;
+    let mut data_string = String::new();
     loop{
         match current_state {
             States::SStart => { 
-                fsm_sstart(&mut current_state);
+                fsm_sstart(&mut current_state,&mut data_string);
             }
             States::SMenu => {                
                 fsm_smenu(&mut current_state);
@@ -100,8 +116,4 @@ fn fsm (){
             }
         }
     }
-}
-
-fn main() {
-    fsm();
 }
