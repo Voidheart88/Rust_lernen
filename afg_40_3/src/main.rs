@@ -12,12 +12,12 @@ an das Hauptprogramm zurück.
 extern crate rand;
 
 use rand::prelude::*;                   //Für den Zufallszahlengenerator
-use std::io::{stdin,stdout,Write};      //
+use std::io::{stdin,stdout,Write};      //Für Ein und Ausgabe von stdin
 
 
 fn matrix2_max (matrix: &Vec<f32>) -> (f32,usize){ //Funktionsdeklaration "fn name(argument1: Datentyp1, ...) -> Rückgabetyp {}"
     let mut max = 0.0;
-    let mut index: usize=0;
+    let mut index: usize = 0;
 
     for i in 0..matrix.len() {
         if max < matrix[i] {
@@ -39,7 +39,7 @@ fn main() {
 
     //Einlesen M
     print!("Gib einen Wert für M ein: ");
-    let _= stdout().flush();
+    let _ = stdout().flush();
     stdin().read_line(&mut input_m_s).expect("Did not enter a correct string");
     if let Some('\n') = input_m_s.chars().next_back() {
         input_m_s.pop();
@@ -50,12 +50,12 @@ fn main() {
 
     //Einlesen N
     print!("Gib einen Wert für N ein: ");
-    let _= stdout().flush();
+    let _ = stdout().flush();
     stdin().read_line(&mut input_n_s).expect("Did not enter a correct string");
-    if let Some('\n')=input_n_s.chars().next_back() {
+    if let Some('\n') = input_n_s.chars().next_back() {
         input_n_s.pop();
     }
-    if let Some('\r')=input_n_s.chars().next_back() {
+    if let Some('\r') = input_n_s.chars().next_back() {
         input_n_s.pop();
     }
 
@@ -73,6 +73,6 @@ fn main() {
 
     //Ausgabe des Maximums durch Funktion
     let result = matrix2_max(&mat); 
-    println!("Wert, Index: {0},{1}",&result.0,&result.1);
-    println!("Stelle in der Matrix - M:{0} N:{1}",&result.1 / input_m, &result.1%input_m);
+    println!("Wert: {0} Index: {1}", &result.0, &result.1);
+    println!("Stelle in der Matrix - M:{0} N:{1}", &result.1/input_m, &result.1%input_m);
 }
