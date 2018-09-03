@@ -40,7 +40,7 @@ fn main() {
     //Einlesen M
     print!("Gib einen Wert für M ein: ");
     let _ = stdout().flush();
-    stdin().read_line(&mut input_m_s).expect("Did not enter a correct string");
+    stdin().read_line(&mut input_m_s).expect("Es wurde keine korrekte Zeile eingegeben");
     if let Some('\n') = input_m_s.chars().next_back() {
         input_m_s.pop();
     }
@@ -51,7 +51,7 @@ fn main() {
     //Einlesen N
     print!("Gib einen Wert für N ein: ");
     let _ = stdout().flush();
-    stdin().read_line(&mut input_n_s).expect("Did not enter a correct string");
+    stdin().read_line(&mut input_n_s).expect("Es wurde keine korrekte Zeile eingegeben");
     if let Some('\n') = input_n_s.chars().next_back() {
         input_n_s.pop();
     }
