@@ -12,7 +12,7 @@ Reiheninduktivität  80.0e-6f Henry
 Reihenkapazität     12.5e-9f Farad
 */
 use std::ops;       //für operatorüberladung
-use std::f32; //Für Wurzelfunktion
+use std::f32;       //Für Wurzelfunktion
 
 const CAP_P : f32 = 5.0e-9;     //Parallelkapazität
 const RES_S : f32 = 50.0;       //SerienWiderstand
