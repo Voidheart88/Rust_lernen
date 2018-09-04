@@ -5,4 +5,6 @@ authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
 
 [dependencies]
 rand = "0.5.5"
-futures = { version = "0.1.13", default-features = false }
+futures-preview = "0.3.0-alpha.4"
+
+

@@ -7,23 +7,17 @@ Berechnung von:
 -Index des Elementes mit der Größten Abweichung vom Durchschnitt
 */
 
-#![feature(async_await, await_macro)]
 extern crate rand;
-extern crate futures;
 
-use futures::executor::block_on;
-use futures::future::{self, FutureExt};
 use rand::prelude::*;               //Für den Zufallszahlengenerator
 use std::time::Instant;             //Für Zeitmessungen
 use std::f32;                       //Für minimal und Maximalwerte von Gleitkommazahlen
 
-fn get_max<F>(array:&[f32]){
-    /*
+fn get_max(array:&[f32]){    
     let mut rand_max = f32::MIN;
     for i in 0..array.len(){
         if rand_max < array[i] {rand_max = array[i];}        
-    }
-    */
+    }    
 }
 
 fn get_min(array:&[f32]){
@@ -97,14 +91,7 @@ fn main() {
                                             //Alternative: Listendeklaration [0,1,2,3,4,5,7...] (wäre nur etwas anstrengend) 
                                             //TODO herausfinden ob man das Array direkt mit Zufallszahlen initialisieren kann
 
-    block_on(async{
-        let fut = future::lazy(|_| vec![0, 1, 2, 3]);
-        let shared1 = fut.shared();
-        let shared2 = shared1.clone();
 
-        assert_eq!(await!(shared1).len(), 4);
-        assert_eq!(await!(shared2).len(), 4);
-    })
      /*
     let mut rand_max = poll_fn(read_line());  
     let mut rand_min: f32 = f32::MAX;
