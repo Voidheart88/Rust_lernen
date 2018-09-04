@@ -7,22 +7,57 @@ Berechnung von:
 -Index des Elementes mit der Größten Abweichung vom Durchschnitt
 */
 
+#![feature(async_await, await_macro)]
 extern crate rand;
+extern crate futures;
 
+use futures::executor::block_on;
+use futures::future::{self, FutureExt};
 use rand::prelude::*;               //Für den Zufallszahlengenerator
 use std::time::Instant;             //Für Zeitmessungen
 use std::f32;                       //Für minimal und Maximalwerte von Gleitkommazahlen
 
+fn get_max<F>(array:&[f32]){
+    /*
+    let mut rand_max = f32::MIN;
+    for i in 0..array.len(){
+        if rand_max < array[i] {rand_max = array[i];}        
+    }
+    */
+}
+
+fn get_min(array:&[f32]){
+    let mut rand_min = f32::MAX;
+    for i in 0..array.len(){
+        if rand_min > array[i] {rand_min = array[i];}
+    }
+}
+
+fn get_max_dev(array:&[f32]){
+    let mut average:f32 = 0.0;
+    let mut max_dev:f32 = f32::MIN;
+    let mut index_dev:usize = 0;
+    for i in 0..array.len(){
+        average += array[i];
+    }
+    for i in 0..array.len(){
+        let dev = array[i] - average;   //Berechnung der aktuellen differenz
+        if dev.abs() > max_dev {        //Wenn die Abweichung größer als die bisherige maximale Abweichung war,
+            max_dev = dev.abs();        //aktualisiere die Abweichung
+            index_dev = i;              //aktualisiere den Index
+        }
+    }
+}
 
 fn main() {
-    let mut array : [f32;1000] = [0.0;1000];//Arraydeklaration mit 1000 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
-                                            //Alternative: Listendeklaration [0,1,2,3,4,5,7...] (wäre nur etwas anstrengend) 
-                                            //TODO herausfinden ob man das Array direkt mit Zufallszahlen initialisieren kann
-    let mut rand_max: f32=f32::MIN;         //Enthält den Maximalwert im Array -initialisiert als Minimum von f32
-    let mut rand_min: f32=f32::MAX;         //Enthält den Minimalwert im Array -initialisiert als Maximum von f32
-    let mut average:  f32=0.0;              //Enthält den Durchschnitt 
-    let mut max_dev: f32 = f32::MIN;        //Enthält den Wert der maximalen Abweichung
-    let mut index_dev: usize=0;             //Enthält den Index an dem die größte Abweichung ist
+    let mut array : [f32;1000] = [0.0;1000];  //Arraydeklaration mit 1000 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
+                                              //Alternative: Listendeklaration [0,1,2,3,4,5,7...] (wäre nur etwas anstrengend) 
+                                              //TODO herausfinden ob man das Array direkt mit Zufallszahlen initialisieren kann
+    let mut rand_max: f32 = f32::MIN;         //Enthält den Maximalwert im Array -initialisiert als Minimum von f32
+    let mut rand_min: f32 = f32::MAX;         //Enthält den Minimalwert im Array -initialisiert als Maximum von f32
+    let mut average: f32 = 0.0;               //Enthält den Durchschnitt 
+    let mut max_dev: f32 = f32::MIN;          //Enthält den Wert der maximalen Abweichung
+    let mut index_dev: usize = 0;             //Enthält den Index an dem die größte Abweichung ist
 
     let now = Instant::now();
 
@@ -55,5 +90,31 @@ fn main() {
     println!("Minimum im Array: {}", rand_min );
     println!("Durchschnitt: {}", average );
     println!("Maximale Abweichung: {}", max_dev);
-    println!("Index: {} \n", index_dev);    
+    println!("Index: {} \n", index_dev);
+
+    //Test mittels Future Crate
+    let mut array : [f32;1000] = [0.0;1000];//Arraydeklaration mit 1000 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
+                                            //Alternative: Listendeklaration [0,1,2,3,4,5,7...] (wäre nur etwas anstrengend) 
+                                            //TODO herausfinden ob man das Array direkt mit Zufallszahlen initialisieren kann
+
+    block_on(async{
+        let fut = future::lazy(|_| vec![0, 1, 2, 3]);
+        let shared1 = fut.shared();
+        let shared2 = shared1.clone();
+
+        assert_eq!(await!(shared1).len(), 4);
+        assert_eq!(await!(shared2).len(), 4);
+    })
+     /*
+    let mut rand_max = poll_fn(read_line());  
+    let mut rand_min: f32 = f32::MAX;
+    let mut average:  f32 = 0.0;
+    let mut max_dev: f32  = f32::MIN;
+    let mut index_dev: usize=0;
+
+    println!("{:?}",rand_max);
+    */
+
+    let now = Instant::now();
+
 }
