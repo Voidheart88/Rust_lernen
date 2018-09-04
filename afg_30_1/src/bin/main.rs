@@ -8,7 +8,9 @@ Berechnung von:
 */
 
 extern crate rand;
+extern crate afg_30_1;
 
+use afg_30_1::ThreadPool;
 use rand::prelude::*;               //Für den Zufallszahlengenerator
 use std::time::Instant;             //Für Zeitmessungen
 use std::f32;                       //Für minimal und Maximalwerte von Gleitkommazahlen
@@ -90,8 +92,11 @@ fn main() {
     let mut array : [f32;1000] = [0.0;1000];//Arraydeklaration mit 1000 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
                                             //Alternative: Listendeklaration [0,1,2,3,4,5,7...] (wäre nur etwas anstrengend) 
                                             //TODO herausfinden ob man das Array direkt mit Zufallszahlen initialisieren kann
-
-
+    let pool = ThreadPool::new(4);
+    let test = 1.0;
+    pool.execute(move |test|{
+        println!("Test1: {}",test);
+    });
      /*
     let mut rand_max = poll_fn(read_line());  
     let mut rand_min: f32 = f32::MAX;
