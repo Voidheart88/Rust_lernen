@@ -15,23 +15,23 @@ use rand::prelude::*;               //Für den Zufallszahlengenerator
 use std::time::Instant;             //Für Zeitmessungen
 use std::f32;                       //Für minimal und Maximalwerte von Gleitkommazahlen
 
-fn get_max(array:&[f32]) -> (f32,bool) {    
+fn get_max(array:&[f32]) -> f32 {    
     let mut rand_max = f32::MIN;
     for i in 0..array.len(){
         if rand_max < array[i] {rand_max = array[i];}        
     }
-    return (rand_max,true);
+    return (rand_max);
 }
 
-fn get_min(array:&[f32]) -> (f32,bool) {
+fn get_min(array:&[f32]) -> f32 {
     let mut rand_min = f32::MAX;
     for i in 0..array.len(){
         if rand_min > array[i] {rand_min = array[i];}
     }
-    return (rand_min,true);
+    return (rand_min);
 }
 
-fn get_max_dev(array:&[f32]) -> (f32,usize,bool) {
+fn get_max_dev(array:&[f32]) -> (f32,usize) {
     let mut average:f32 = 0.0;
     let mut max_dev:f32 = f32::MIN;
     let mut index_dev:usize = 0;
@@ -46,7 +46,7 @@ fn get_max_dev(array:&[f32]) -> (f32,usize,bool) {
             index_dev = i;              //aktualisiere den Index
         }
     }
-    return (max_dev,index_dev,true);
+    return (max_dev,index_dev);
 }
 
 fn main() {
@@ -95,10 +95,10 @@ fn main() {
     //Test mittels Threadpool:
 
     let mut array : [f32;1000] = [0.0;1000];
-    let mut rand_max: (f32,bool) = (f32::MIN,false);
-    let mut rand_min: (f32,bool) = (f32::MAX,false);
-    let mut average:  (f32,bool) = (0.0,false);
-    let mut max_dev: (f32,usize,bool) = (0.0,0,false);
+    let mut rand_max: f32 = f32::MIN;
+    let mut rand_min: f32 = f32::MAX;
+    let mut average:  f32 = 0.0;
+    let mut max_dev: (f32,usize) = (0.0,0);
 
     let now = Instant::now();
 
@@ -112,21 +112,18 @@ fn main() {
     let pool = ThreadPool::new(4);
 
     pool.execute(move ||{
-        rand_max = get_max(&array);        
+        rand_max = get_max(&array);
+        println!("Maximum: {}",rand_max);
     });
     pool.execute(move ||{
-        rand_min = get_min(&array);        
+        rand_min = get_min(&array);
+        println!("Minimum: {}",rand_min);      
     });
     pool.execute(move ||{
-        max_dev = get_max_dev(&array);        
+        max_dev = get_max_dev(&array);
+        println!("Maximale Abweichung: {} bei : {}",max_dev.0,max_dev.1);       
     });
-    /*while (rand_max.1 == false || rand_min.1 == false || max_dev.2 == false) {
-        println!("läuft!")
-    }*/
     println!("Zeit vergangen - nach Auswertung: {:?} \n",now.elapsed());
-        
-    println!("Maximum: {}",rand_max.0);
-    println!("Minimum: {}",rand_min.0);
-    println!("Maximale Abweichung: {} bei : {}",max_dev.0,max_dev.1);
+    
 
 }
