@@ -1,0 +1,8 @@
+[package]
+name = "rust_ogl"
+version = "0.1.0"
+authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
+
+[dependencies]
+sdl2 = { version = "0.31.0", features = ["bundled", "static-link"] }
+gl = "0.10.0"
