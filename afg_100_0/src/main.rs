@@ -29,34 +29,14 @@ States:
 5 - Ende, Schließe die geöffnete Datei, gib alle alloziierten zeiger frei
 */
 
-use std::io;
-use std::io::prelude::*;
-use std::io::BufReader;
 use std::fs::File;
-use std::path::Path;
-use std::slice;
-use std::mem;
+use std::process::{Command, Stdio};
 
 //Datensatz
 struct Record{
     a_number: i32,
     interpret: [char;41],
     title: [char;41],
-}
-
-fn read_structs<T, P: AsRef<Path>>(path: P) -> io::Result<Vec<T>> {
-    let path = path.as_ref();
-    let struct_size = ::std::mem::size_of::<T>();
-    let num_bytes = try!(std::fs::metadata(path)).len() as usize;
-    let num_structs = num_bytes / struct_size;
-    let mut reader = BufReader::new(try!(File::open(path)));
-    let mut r = Vec::<T>::with_capacity(num_structs);
-    unsafe {
-        let mut buffer = slice::from_raw_parts_mut(r.as_mut_ptr() as *mut u8, num_bytes);
-        try!(reader.read_exact(buffer));
-        r.set_len(num_structs);
-    }
-    Ok(r)
 }
 
 //Zustandsautomat:
@@ -74,11 +54,7 @@ enum States {
 //Zustandsaufrufe
 
 //Startzustand, Lade die Datenbank und gehe über in den Menuzustand 
-fn fsm_sstart(current_state:&mut States, data_string:&mut String){
-    //let const record_size = mem::size_of::<Record>();
-    /*
-    let mut buffer = [0;mem::size_of::<Record>()];
-
+fn fsm_sstart(current_state:&mut States){
     println!("Start");
     println!("Lade Datenbank");    
     let mut file = File::open("Datenbank.db");
@@ -89,13 +65,14 @@ fn fsm_sstart(current_state:&mut States, data_string:&mut String){
     }
     else {
         println!("Datei vorhanden");        
-    }*/
-    let buff = read_structs::<Record, _>("path/to/file");
-    println!("{:?}", buff.a_number);
+    }
     *current_state = States::SMenu;
 }
 //Menuzustand, Warte auf Eingabe vom Nutzer und Wechsle abhängig von Eingabe in 2(Eingabe),3(Ausgabe),4(Änderung),5(Ende)
 fn fsm_smenu(current_state:&mut States){
+    let cls = std::process::Command::new("cls").status();
+    println!("{:?}",cls);
+
     println!("Menu");
     *current_state = States::SIn;
 }
@@ -122,11 +99,10 @@ fn fsm_sfin(){
 
 fn main() {
     let mut current_state: States = States::SStart;
-    let mut data_string = String::new();
     loop{
         match current_state {
             States::SStart => { 
-                fsm_sstart(&mut current_state,&mut data_string);
+                fsm_sstart(&mut current_state);
             }
             States::SMenu => {                
                 fsm_smenu(&mut current_state);
