@@ -1,0 +1,9 @@
+[package]
+name = "rust_gtk"
+version = "0.1.0"
+authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
+
+[dependencies]
+#gdk = "0.8.0"
+
+gtk = { version = "0.2", features = ["v3_18"] }

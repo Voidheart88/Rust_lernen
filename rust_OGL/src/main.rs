@@ -117,7 +117,6 @@ fn main() {
                 3 // number of indices to be rendered
             );
         }
-
         window.gl_swap_window();    //Tauscht den Windowbuffer
     }
 }
