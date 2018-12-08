@@ -1,7 +1,8 @@
 Offene Fragen:
 
 - Herausfinden was ein Macro von einem normalen Funktionsaufruf unterscheidet
-- Herausfinden wie man Taskbasierte Concurrency bewerkstelligt
+- Herausfinden wie man taskbasierte Concurrency bewerkstelligt
+- Die Sache mit den Traits verstehen
 
 Abgeschlossene Fragen:
 
