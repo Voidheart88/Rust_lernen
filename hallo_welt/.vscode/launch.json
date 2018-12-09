@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "gdb",
+            "request": "launch",
+            "name": "Launch Program gdb",
+            "target": "${workspaceRoot}/target/debug/hallo_welt.exe",
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "lldb-mi",
+            "request": "launch",
+            "name": "Launch Program lldb",
+            "target": "${workspaceRoot}/target/debug/hallo_welt.exe",
+            "cwd": "${workspaceRoot}"
+        }
+    ]
+}

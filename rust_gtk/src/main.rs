@@ -1,3 +1,9 @@
+
+/*
+
+*/
+
+
 extern crate gtk;
 
 use std::process;
@@ -7,6 +13,7 @@ use gtk::*;
 //use std::sync::Arc;
 //use std::sync::atomic::{AtomicUsize, Ordering};
 
+//Frontend Modul
 pub mod frontend{
     use gtk::*;
 
@@ -84,6 +91,8 @@ pub mod frontend{
 
             //Erstelle das Texteingabefenster
             let text_view = TextView::new();
+            //Textview-buffer
+            let buffer = text_view.get_buffer().expect("Couldn't get window");
 
             //Erstelle die Buttons
             let button1 = Button::new_with_mnemonic("7");
@@ -105,7 +114,9 @@ pub mod frontend{
 
             //Einstellung der Elemente
             text_view.set_editable(false);
+            buffer.set_text("testtext");
 
+            //Hänge alle Buttons an den Grid
             grid.attach(&button1,0,1,1,1);
             grid.attach(&button2,1,1,1,1);
             grid.attach(&button3,2,1,1,1);
@@ -123,8 +134,13 @@ pub mod frontend{
             grid.attach(&button15,2,4,1,1);
             grid.attach(&button16,3,4,1,1);
 
+            //Packe den Grid
             container.pack_start(&text_view,false,false,1);
             container.pack_end(&grid,false,false,1);
+
+            //buffer
+
+
             Content {container,grid,text_view}
         }
     }

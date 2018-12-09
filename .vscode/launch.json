@@ -1,14 +1,21 @@
 {
-    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
-    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
-    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "type": "node",
+            "type": "lldb-mi",
             "request": "launch",
-            "name": "Programm starten",
-            "program": "${file}"
-        }
+            "name": "lldb-mi",
+            "target": "./target/debug",
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "lldb-mi",
+            "request": "launch",
+            "name": "lldb-mi -b",
+            "target": "./target/debug/cli",
+            "cwd": "${workspaceRoot}",
+            "arguments": "mode -b"
+        },
     ]
 }
