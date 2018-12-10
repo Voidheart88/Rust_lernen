@@ -3,7 +3,7 @@ extern crate gtk;
 use std::process;
 use gtk::*;
 
-pub struct App {
+pub struct Frontend {
     pub window: Window,
     pub header: Header,
     pub content: Content,
@@ -20,7 +20,7 @@ pub struct Content {
     pub buffer:TextBuffer,      
 }
     
-pub struct backend{
+pub struct Backend{
 
 }
 
@@ -32,10 +32,10 @@ fn run(){
     }
 
     // Erstellt die App
-    let app = frontend::App::new();
+    let frontend = Frontend::new();
 
     // Macht alle Widgeds sichtbar
-    app.window.show_all();
+    frontend.window.show_all();
 
     // Startet die GTK Event-Schleife
     gtk::main();
@@ -47,8 +47,8 @@ fn main() {
     run();
 }
 
-impl App {
-    pub fn new() -> App {
+impl Frontend {
+    pub fn new() -> Frontend {
         // Erstelle ein neues Fenster
         let window = Window::new(WindowType::Toplevel);
         // Erstelle ein Header-Objekt
@@ -76,7 +76,7 @@ impl App {
         });
 
         // Erstelle die App
-        App { window, header , content}
+        Frontend { window, header , content}
     }
 }
 
