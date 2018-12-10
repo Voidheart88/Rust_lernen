@@ -84,6 +84,7 @@ impl Header {
     fn new() -> Header {
         // Erstelle eine Header Bar
         let container = HeaderBar::new();
+        
         // Zeige den Schließen Button
         container.set_show_close_button(true);
 
@@ -145,6 +146,7 @@ impl Content {
         grid.attach(&button14,1,4,1,1);
         grid.attach(&button15,2,4,1,1);
         grid.attach(&button16,3,4,1,1);
+
         //Packe den Grid
         container.pack_start(&text_view,false,false,1);
         container.pack_end(&grid,false,false,1);
