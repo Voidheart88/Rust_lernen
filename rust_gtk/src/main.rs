@@ -1,12 +1,16 @@
 extern crate gtk;
 
 use std::process;
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
+use std::thread;
 use gtk::*;
 
 pub struct Frontend {
     pub window: Window,
     pub header: Header,
     pub content: Content,
+    pub sender: Sender<i8>,
 }
 
 pub struct Header {
@@ -21,18 +25,22 @@ pub struct Content {
 }
     
 pub struct Backend{
-
+    pub receiver: Receiver<i8>,
 }
 
-fn run(){
+
+//Main
+fn main() {
     // Initialisiert GTK
     if gtk::init().is_err() {
         eprintln!("failed to initialize GTK Application");
         process::exit(1);
     }
+    // Erstellt einen Channel
+     let (tx, rx): (Sender<i8>, Receiver<i8>) = mpsc::channel();
 
     // Erstellt die App
-    let frontend = Frontend::new();
+    let frontend = Frontend::new(tx);
 
     // Macht alle Widgeds sichtbar
     frontend.window.show_all();
@@ -40,15 +48,16 @@ fn run(){
     // Startet die GTK Event-Schleife
     gtk::main();
 }
-
-
-//Main
-fn main() {
-    run();
-}
+/*
+impl Backend {
+    pub fn new() -> Backend{
+        Backend {};
+    }
+} 
+*/
 
 impl Frontend {
-    pub fn new() -> Frontend {
+    pub fn new(sender: Sender<i8>) -> Frontend {
         // Erstelle ein neues Fenster
         let window = Window::new(WindowType::Toplevel);
         // Erstelle ein Header-Objekt
@@ -76,7 +85,7 @@ impl Frontend {
         });
 
         // Erstelle die App
-        Frontend { window, header , content}
+        Frontend { window, header , content, sender}
     }
 }
 
