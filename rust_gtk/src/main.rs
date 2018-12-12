@@ -40,7 +40,9 @@ fn main() {
      let (tx, rx): (Sender<i8>, Receiver<i8>) = mpsc::channel();
 
     // Erstellt die App
-    let frontend = Frontend::new(tx);
+    let frontend = Frontend::new(tx.clone());
+
+    let backend = Backend::new(rx);
 
     // Macht alle Widgeds sichtbar
     frontend.window.show_all();
@@ -48,13 +50,16 @@ fn main() {
     // Startet die GTK Event-Schleife
     gtk::main();
 }
-/*
+
 impl Backend {
-    pub fn new() -> Backend{
-        Backend {};
+    pub fn new(receiver: Receiver<i8>) -> Backend{
+        Backend {receiver}
+    }
+    pub fn run() {
+        
     }
 } 
-*/
+
 
 impl Frontend {
     pub fn new(sender: Sender<i8>) -> Frontend {
