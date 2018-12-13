@@ -6,11 +6,18 @@ use std::sync::mpsc;
 use std::thread;
 use gtk::*;
 
+enum Message {
+    MPlus,
+    MDinus,
+    MMulti,
+    MDiv,
+}
+
 pub struct Frontend {
     pub window: Window,
     pub header: Header,
     pub content: Content,
-    pub sender: Sender<i8>,
+    sender: Sender<i8>,
 }
 
 pub struct Header {
@@ -25,7 +32,7 @@ pub struct Content {
 }
     
 pub struct Backend{
-    pub receiver: Receiver<i8>,
+    receiver: Receiver<i8>,
 }
 
 
@@ -40,9 +47,7 @@ fn main() {
      let (tx, rx): (Sender<i8>, Receiver<i8>) = mpsc::channel();
 
     // Erstellt die App
-    let frontend = Frontend::new(tx.clone());
-
-    let backend = Backend::new(rx);
+    let frontend = Frontend::new(tx);
 
     // Macht alle Widgeds sichtbar
     frontend.window.show_all();
@@ -52,11 +57,8 @@ fn main() {
 }
 
 impl Backend {
-    pub fn new(receiver: Receiver<i8>) -> Backend{
-        Backend {receiver}
-    }
-    pub fn run() {
-        
+    pub fn new() -> Backend{
+        Backend {};
     }
 } 
 
