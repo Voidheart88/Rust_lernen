@@ -160,14 +160,17 @@ impl Content {
         let button2 = Button::new_with_mnemonic("8");
         let button3 = Button::new_with_mnemonic("9");
         let button4 = Button::new_with_mnemonic("/");
+
         let button5 = Button::new_with_mnemonic("4");
         let button6 = Button::new_with_mnemonic("5");
         let button7 = Button::new_with_mnemonic("6");
         let button8 = Button::new_with_mnemonic("*");
+
         let button9 = Button::new_with_mnemonic("1");
         let button10 = Button::new_with_mnemonic("2");
         let button11 = Button::new_with_mnemonic("3");
         let button12 = Button::new_with_mnemonic("-");
+
         let button13 = Button::new_with_mnemonic(",");
         let button14 = Button::new_with_mnemonic("0");
         let button15 = Button::new_with_mnemonic(" ");
@@ -177,19 +180,21 @@ impl Content {
         let butsend = sender.clone();
         button1.connect_clicked(move |_but| { butsend.send(Message::MSeven).unwrap();});
         let butsend = sender.clone();
-        button2.connect_clicked(move|_but| { butsend.send(Message::MSeven).unwrap();});
+        button2.connect_clicked(move|_but| { butsend.send(Message::MEight).unwrap();});
         let butsend = sender.clone();
-        button3.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button3.connect_clicked(move|_but| {butsend.send(Message::MNine).unwrap();});
         let butsend = sender.clone();
-        button4.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button4.connect_clicked(move|_but| {butsend.send(Message::MDiv).unwrap();});
+
         let butsend = sender.clone();
-        button5.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button5.connect_clicked(move|_but| {butsend.send(Message::MFour).unwrap();});
         let butsend = sender.clone();
-        button6.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button6.connect_clicked(move|_but| {butsend.send(Message::MFive).unwrap();});
         let butsend = sender.clone();
-        button7.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button7.connect_clicked(move|_but| {butsend.send(Message::MSix).unwrap();});
         let butsend = sender.clone();
-        button8.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button8.connect_clicked(move|_but| {butsend.send(Message::MMulti).unwrap();});
+
         let butsend = sender.clone();
         button9.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
         let butsend = sender.clone();
@@ -198,6 +203,7 @@ impl Content {
         button11.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
         let  butsend = sender.clone();
         button12.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        
         let butsend = sender.clone();
         button13.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
         let butsend = sender.clone();
