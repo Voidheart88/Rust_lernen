@@ -19,8 +19,8 @@ pub enum Message {
     MFive,
     MSix,
     MSeven,
-    Meight,
-    Mnine,
+    MEight,
+    MNine,
 }
 
 pub struct Frontend {
@@ -88,8 +88,8 @@ impl Backend {
                 Message::MFive   => println!("5"),
                 Message::MSix    => println!("6"),
                 Message::MSeven  => println!("7"),
-                Message::Meight  => println!("8"),
-                Message::Mnine   => println!("9"),
+                Message::MEight  => println!("8"),
+                Message::MNine   => println!("9"),
             }
         }
     }
@@ -196,22 +196,22 @@ impl Content {
         button8.connect_clicked(move|_but| {butsend.send(Message::MMulti).unwrap();});
 
         let butsend = sender.clone();
-        button9.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button9.connect_clicked(move|_but| {butsend.send(Message::MOne).unwrap();});
         let butsend = sender.clone();
-        button10.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button10.connect_clicked(move|_but| {butsend.send(Message::MTwo).unwrap();});
         let butsend = sender.clone();
-        button11.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button11.connect_clicked(move|_but| {butsend.send(Message::MTree).unwrap();});
         let  butsend = sender.clone();
-        button12.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button12.connect_clicked(move|_but| {butsend.send(Message::MMinus).unwrap();});
         
         let butsend = sender.clone();
         button13.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
         let butsend = sender.clone();
-        button14.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button14.connect_clicked(move|_but| {butsend.send(Message::MZero).unwrap();});
         let butsend = sender.clone();
         button15.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
         let butsend = sender.clone();
-        button16.connect_clicked(move|_but| {butsend.send(Message::MSeven).unwrap();});
+        button16.connect_clicked(move|_but| {butsend.send(Message::MPlus).unwrap();});
 
         //Einstellung der Elemente
         text_view.set_editable(false);
