@@ -16,7 +16,9 @@ use std::time::Instant;             //Für Zeitmessungen
 use std::f32;                       //Für minimal und Maximalwerte von Gleitkommazahlen
 
 fn main() {
-    let mut array : [f32;3] = [0.0;3];  //Arraydeklaration mit 1000 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
+    rayon::ThreadPoolBuilder::new().num_threads(4).build_global().unwrap(); //erstelle den Threadpool
+
+    let mut array : [f32;1000] = [0.0;1000];  //Arraydeklaration mit 1000 Feldern [Datentyp;Anzahl] initialisiert mit 0.0
                                               //Alternative: Listendeklaration [0,1,2,3,4,5,7...] (wäre nur etwas anstrengend) 
                                               //TODO herausfinden ob man das Array direkt mit Zufallszahlen initialisieren kann
     let mut rand_max: f32 = f32::MIN;         //Enthält den Maximalwert im Array -initialisiert als Minimum von f32
@@ -49,7 +51,7 @@ fn main() {
             index_dev = i;              //aktualisiere den Index
         }
     }
-    println!("Zeit vergangen - nach Auswertung: {:?} \n",now.elapsed());
+    println!("Zeit vergangen - ende Normal: {:?} \n",now.elapsed());
     println!("Maximum im Array: {}", rand_max );
     println!("Minimum im Array: {}", rand_min );
     println!("Durchschnitt: {}", average );
@@ -61,10 +63,15 @@ fn main() {
     let now = Instant::now(); //Beginne Zeitmessung    
     println!("Zeit vergangen - Start parallel: {:?}",now.elapsed() );
 
-    let par_min = array.par_iter().fold(||f32::MAX,|a, &b| a.min(b)); //Suche das Minimum
-    let par_max = array.par_iter().fold(||f32::MIN,|a, &b| a.max(b)); //Suche das Minimum
+    let par_max = array.par_iter().map(|b|*b as f32).reduce(||f32::MIN,|a, b| a.max(b)) ; //Suche das Maximum
+    let par_min = array.par_iter().map(|b|*b as f32).reduce(||f32::MAX,|a, b| a.min(b)) ; //Suche das Minimum    
+    let mut par_avg: f32 = array.par_iter().sum(); //addiere werte und berechne den Durchschnitt
+    par_avg /= array.len() as f32;
+    let par_max_dev = 0;
+
     println!("Zeit vergangen - Ende parallel: {:?}",now.elapsed() );
-    println!("Maximum im Array: {:?}", par_min );
-    println!("Minimum im Array: {:?}", par_max );
+    println!("Maximum im Array: {}", par_max );
+    println!("Minimum im Array: {}", par_min );
+    println!("Durchschnitt: {}", par_avg );
 
 }
