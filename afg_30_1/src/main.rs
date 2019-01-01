@@ -107,8 +107,8 @@ fn main() {
     println!("Minimum im Array: {}", th_min_rx.recv().unwrap());
     println!("Durchschnitt: {}", th_avg_rx.recv().unwrap());
 
-    println!("\nZeit Normal: {:?}",t_norm);
-    println!("Zeit Normal: {:?}",t_rayon);
-    println!("Zeit Normal: {:?}",t_threads);
+    println!("\nZeit normal: {:?}",t_norm);
+    println!("Zeit rayon: {:?}",t_rayon);
+    println!("Zeit threads: {:?}",t_threads);
     
 }
