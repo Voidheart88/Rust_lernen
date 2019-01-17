@@ -22,12 +22,13 @@ trait FnBox {
     fn call_box(self: Box<Self>);   //Hat irgendwas mit dem Ausführen der Funktion zu tun
 }
 
-impl<F: FnOnce()> FnBox for F {
-    fn call_box(self: Box<F>) {     //Hat etwas mit dem ausführen der Funktion zu tun
+impl<F: FnOnce()> FnBox for F {     //Funktionsaufruf
+    fn call_box(self: Box<F>) {     //
         (*self)()
     }
 }
 
+//Box = Zeiger der auf dem heap allokiert
 type Job = Box<FnBox + Send + 'static>; //Job Datentyp um Funktionen auszuführen
 
 impl ThreadPool {
