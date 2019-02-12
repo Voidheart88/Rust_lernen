@@ -57,8 +57,13 @@ fn main() {
 }
 
 impl Backend {
-    pub fn new() -> Backend{
-        Backend {};
+    pub fn new(receiver: Receiver<i8>) -> Backend{
+        Backend {receiver}
+    }
+    pub fn run() {
+        loop {
+            rx.recv()
+        }
     }
 } 
 
