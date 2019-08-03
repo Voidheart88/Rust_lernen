@@ -3,7 +3,7 @@ name = "msp-test"
 version = "0.1.0"
 authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
 edition = "2018"
+links = "msp430-elf-gcc"
+build = "build.rs"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html 

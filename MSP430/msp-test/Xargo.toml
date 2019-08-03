@@ -1,0 +1,16 @@
+[dependencies.core]
+stage = 0
+
+[dependencies.compiler_builtins]
+features = ["mem"]
+stage = 1
+
+[dependencies]
+volatile-register = "0.2.0"
+no-std-compat = "0.1.0"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

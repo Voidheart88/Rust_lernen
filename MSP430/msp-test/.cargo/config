@@ -1,0 +1,10 @@
+#[build]
+#target = "msp430-none-elf"
+
+[target.msp430-none-elf]
+rustflags = [
+    "-C", "link-arg=-Tmsp430f5529.ld",
+    "-C", "link-arg=-mmcu=msp430f5529",
+    "-C", "link-arg=-nostartfiles",
+    "-C", "-mlarge",
+]
