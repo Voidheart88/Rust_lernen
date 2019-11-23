@@ -1,9 +1,0 @@
-[package]
-name = "rust_lernen"
-version = "0.0.0"
-authors = ["Voidheart88 <39334902+Voidheart88@users.noreply.github.com>"]
-Workspace = "Rust_lernen/afg_30_1/src/main.rs"
-
-[[bin]]
-name = "rust_lernen"
-path = "src/bin/rust_lernen.exe"
