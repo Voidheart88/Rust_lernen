@@ -3,28 +3,36 @@
 // Starts a NGSpice Simulation and returns statistical data of output values
 
 //represents a node as connection between circuit elements
-extern crate libloading as lib;
 
-#[derive(Debug)]
-struct Node {
-    name: String,
+#[derive(Debug,PartialEq,Clone)]
+struct Part{
+    name: &'static str,
+    nodes: Vec<&'static str>,
+    value: &'static str,
+    model: &'static str,
 }
 
-//represents a part - a Circuit element
+impl Part{
+    fn new(p_name:&'static str,p_nodes:Vec<&'static str>,p_value:&'static str,p_model:&'static str) -> Part{
+        Part{
+            name:p_name,
+            nodes:p_nodes,
+            value:p_value,
+            model:p_model,
+        }
+    }
+}
+
 #[derive(Debug)]
-struct Part{
-    nodes: Vec<Node>,
-    name: String,
-    value: String,
-    model: String,
+enum Mode{
+    TRAN,
+    AC,
 }
 
 #[derive(Debug)]
 struct Circuit{
-    title: String,
-    includes: Vec<String>,
+    head: Vec<String>,
     parts: Vec<Part>,
-    options: Vec<String>,
     models: Vec<String>,
     directives: Vec<String>,
 }
@@ -71,36 +79,60 @@ impl Part{
 }
 
 impl Circuit{
-    //Ctor
-    pub fn new(c_title: String) -> Circuit {
+    pub fn new(n_title: String) -> Circuit{
         Circuit{
-            title: c_title,
-            includes: vec![],
+            head: vec![n_title],
             parts: vec![],
-            options:vec![],
             models: vec![],
-            directives: vec![],
+            tail: vec![],
+            mode: Mode::TRAN,
+            tran: ("1m".to_string(),"1".to_string()),
         }
     }
 
-    //Adds a Part
-    pub fn add_part(&mut self,part:Part){
-        self.parts.push(part)
+    pub fn add_part(&mut self,part:&Part){
+        if !(self.parts.iter().any(|x| *x  == part.clone())){
+            &self.parts.push(part.clone());
+        }
     }
 
-    pub fn print_netlist(&self){
-        println!("{:?}",self.includes);
-        println!("{:?}",self.parts);
-        println!("{:?}",self.options);
-        println!("{:?}",self.models);
-        println!("{:?}",self.directives);
+    pub fn set_tran(&mut self,step:String,dur:String){
+        self.mode = Mode::TRAN;
+        self.tran=(step,dur);
     }
-    
-    fn get_netstring(&self) -> String{
-        let tit = &self.title;
-        let opt = &self.options.join("\n");
 
-        return String::from("bla");
+    pub fn add_tail(&mut self,input:&String){
+        if !(self.tail.iter().any(|x| *x  == input.clone())){
+            &self.tail.push(input.clone());
+        }
+    }
+
+    pub fn get_netlist(&self) -> String{
+        let mut netlist = String::new();
+        netlist += ".title ";
+        netlist += &self.head.iter().fold(String::new(), |acc, x| acc + &x+"\n");
+        netlist += &self.parts
+            .iter()
+            .map(|x|x.name.to_string()+" "+x.nodes+" "+x.value+" "+x.model+"\n")
+            .collect::<Vec<String>>()
+            .join("");
+        match &self.mode{
+            Mode::TRAN => {
+                netlist += ".tran ";
+                netlist += &self.tran.0;
+                netlist += " ";
+                netlist += &self.tran.1;
+                netlist += "\n";
+            },
+            _ => {
+                netlist += ".tran 1m 1 \n";
+            },
+        }
+        netlist += ".control\n";
+        netlist += &self.tail.iter().fold(String::new(), |acc, x| acc + &x+"\n");
+        netlist += ".endc\n";
+        netlist += ".end\n";
+        netlist
     }
 }
 
@@ -112,60 +144,6 @@ mod tests {
 
     #[test]
     fn main(){
-        println!("Start test");
-        let mut c1 = Circuit::new(String::from("Testcircuit"));
-        let n1 = Node::new(String::from("N001"));
-        let n2 = Node::new(String::from("0"));
-        c1.add_part(
-            Part{
-                nodes: vec![n1,n2],
-                name: String::from("R1"),
-                value: String::from("100"),
-                model: String::from(""),
-            }
-        );
-        println!("Netstring: {:?}",c1.get_netstring());
-        let lib = call_dynamic();
-        println!("{:?}",lib);
+        let p1 = Part::new("V1",vec!["N001","0"],"10","");
     }
 }
-
-/*
-def getNetstring(self):
-    #build preamble
-    netlist: str = self.title
-#add includes
-    if len(self.includes):
-        for line in self.includes:
-            netlist+="\n"
-            netlist+=(".include ")
-            netlist+=line
-    #add Parts
-    for part in self.parts:
-        netlist+="\n"
-        netlist+=(part.name+" ")
-        for node in part.nodes:
-            netlist+=(node+" ")
-        if part.value != None: netlist+=str(part.value)
-        if part.model != None: netlist+=str(part.model)
-    #add models
-    if len(self.models) != 0:
-        for model in self.models:
-            netlist+="\n"
-            netlist+=".model "
-            netlist+=model+" "+model
-    #add Spice Directives 
-    if len(self.directives) != 0:
-        for directive in self.directives:
-            netlist+="\n"
-            netlist+=directive   
-    #add options
-    if len(self.options) != 0:
-        netlist+="\n.control"
-        for option in self.options:
-            netlist+="\n"
-            netlist+=option
-        netlist+="\n.endc"
-    netlist+="\n.end"
-    return netlist
-*/
