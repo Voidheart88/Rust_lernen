@@ -3,7 +3,7 @@
 // Starts a NGSpice Simulation and returns statistical data of output values
 
 //represents a node as connection between circuit elements
-
+extern crate libloading as lib;
 
 #[derive(Debug)]
 struct Node {
@@ -27,6 +27,26 @@ struct Circuit{
     options: Vec<String>,
     models: Vec<String>,
     directives: Vec<String>,
+}
+
+struct NGSpice{
+    init: unsafe extern fn() -> u32,
+}
+
+impl NGSpice{
+    pub fn new () -> NGSpice {
+        NGSpice{
+            init: NGSpice::call_init(),
+
+        }
+    }
+    fn call_init() -> lib::Result<u32> {
+        let lib = lib::Library::new("./lib/ngspice.dll")?;
+        unsafe {
+            let init: lib::Symbol<unsafe extern fn() -> u32> = lib.get(b"ngSpice_Init")?;
+            Ok(init())
+        }
+    }
 }
 
 
@@ -84,6 +104,8 @@ impl Circuit{
     }
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use crate::*;
@@ -102,7 +124,9 @@ mod tests {
                 model: String::from(""),
             }
         );
-        println!("Netstring: {:?}",c1.get_netstring())
+        println!("Netstring: {:?}",c1.get_netstring());
+        let lib = call_dynamic();
+        println!("{:?}",lib);
     }
 }
 
