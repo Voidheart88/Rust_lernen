@@ -1,0 +1,9 @@
+.title modelfit
+V1 N001 0 DC 10
+D1 N001 0  BYT03-400
+
+BYT03-400 D (
+.save I(V1)
+.dc V1 0 10 10m
+.run
+.end

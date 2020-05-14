@@ -10,4 +10,8 @@ edition = "2018"
 path = "src/spice.rs"
 
 [dependencies]
-libloading = "0.5.2"
+rand = "0.7.3"
+easy-hash = "0.1.0"
+generic-array = "0.14.1"
+crossbeam = "0.7.3"
+bus = "2.2.3"
