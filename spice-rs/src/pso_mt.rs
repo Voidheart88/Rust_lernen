@@ -27,8 +27,13 @@ pub struct Swarm<N: ArrayLength<f64>>{
 	coeff: (f64,f64,f64),	//Coefficients
 	u_barrier: Vect::<N>,	//upper barrier
 	l_barrier: Vect::<N>,	//lower barrier
-	gmin_r: crossbeam::Receiver<(Vect::<N>,f64)>,	//Receiver for possible global minimum
-	coeff_s: bus::Bus<(f64,f64,f64,bool)>,
+	gmin_c: (crossbeam::Sender<(Vect::<N>,f64)>,crossbeam::Receiver<(Vect::<N>,f64)>),
+	state_s: bus::Bus<(f64,f64,f64,bool)>,
+}
+
+#[derive(Debug)]
+pub enum PsoErr{
+	TolBelowZero,
 }
 
 struct Particle<N: ArrayLength<f64>>{
@@ -36,19 +41,20 @@ struct Particle<N: ArrayLength<f64>>{
 	vi: Vect::<N>,															//Speedvector
 	loc_min: (Vect::<N>,f64),										//Position and value of local minimum
 	gmin: (Vect::<N>,f64),											//Position and value of global minimum
-	stop: bool,																	// stop state, if true -> stop calc
-	coeff: (f64,f64,f64),												//
-	gmin_s: crossbeam::Sender<(Vect::<N>,f64)>,	//Sender for possible global minimum
-	coeff_r: bus::BusReader<(f64,f64,f64,bool)>,//Receiver for state changes
+	state: (f64,f64,f64,bool),									//state of the particle
+	gmin_c: (crossbeam::Sender<(Vect::<N>,f64)>,crossbeam::Receiver<(Vect::<N>,f64)>),//Channel for possible global minimum	//Sender for possible global minimum
+	state_r: bus::BusReader<(f64,f64,f64,bool)>,//Receiver for state changes
 }
 
-impl<N: ArrayLength<f64>> Swarm<N> {
-	pub fn new(a:f64,b1:f64,b2:f64,tol:f64,gmin_r:crossbeam::Receiver<(Vect::<N>,f64)>,coeff_s:bus::Bus<(f64,f64,f64,bool)>,opt_u_barrier:Option<Vect<N>>,opt_l_barrier:Option<Vect<N>>) -> Option<Swarm<N>> {
+impl<N: 'static +  ArrayLength<f64>> Swarm<N> {
+	pub fn new(a:f64,b1:f64,b2:f64,tol:f64,opt_u_barrier:Option<Vect<N>>,opt_l_barrier:Option<Vect<N>>) -> Result<Swarm<N>,PsoErr> {
 		let mut rng = rand::thread_rng();
 		let mut u_barrier = Vect::new(f64::MAX);
 		let mut l_barrier = Vect::new(f64::MAX);
+		let (gmin_s,gmin_r) = unbounded();
+		let state_s = Bus::<(f64,f64,f64,bool)>::new(10);
 		if tol < 0.0 {
-			return None;
+			return Err(PsoErr::TolBelowZero);
 		}
 		if let Some(barrier) = opt_u_barrier{
 			u_barrier = barrier;
@@ -56,69 +62,104 @@ impl<N: ArrayLength<f64>> Swarm<N> {
 		if let Some(barrier) = opt_l_barrier{
 			l_barrier = barrier;
 		}
-		return Some(Swarm{
+		return Ok(Swarm{
 			min: (Vect::new(f64::MAX),rng.gen()),	//Position and value of global minimum at random spot, will be overwritten after first function evaluation
-			stop: false, 					//Stop condition
-			tol: tol,							//Tolerance for abort condition
-			coeff: (a,b1,b2),			//Coefficients
-			u_barrier: u_barrier,	//Upper barrier
-			l_barrier: l_barrier,	//Lower barrier
-			gmin_r: gmin_r,				//Receiver for possible global minimum
-			coeff_s: coeff_s,			//Sender for coefficients
+			stop: false, 						//Stop condition
+			tol: tol,								//Tolerance for abort condition
+			coeff: (a,b1,b2),				//Coefficients
+			u_barrier: u_barrier,		//Upper barriers
+			l_barrier: l_barrier,		//Lower barriers
+			gmin_c: (gmin_s,gmin_r),//Channel for possible global minimum
+			state_s: state_s,				//Sender for coefficients
 		})
 	}
-	pub fn build(){
-		unimplemented!();
+	pub fn solve<F: 'static>(&mut self,fun:F,opt_n:Option<usize>,opt_coeff:Option<(f64,f64,f64)>) -> Result<(Vect<N>,f64),PsoErr>  where F: std::marker::Send +Fn(&Vect<N>) -> f64{
+		//check parameter
+		let mut swarm_size = 0;
+		let mut coeff = (1.0,0.5,0.5);
+		if let Some(o) = opt_n{
+			swarm_size = o;
+		}
+		else {
+			swarm_size = N::to_usize()*5;
+		}
+		if let Some(o) = opt_coeff{
+			coeff = o;
+		}
+		//Build swarm
+		for i in 0..swarm_size{
+			let particle = Particle::new(self.gmin_c.clone(), self.state_s.add_rx(), None, None);
+			thread::spawn(move ||{
+				particle.work(fun, i as i64)
+			});
+		}
+		return Ok((Vect::new(0.0),0.0))
 	}
 }
 
-impl<N: std::fmt::Debug + ArrayLength<f64>> Particle<N> {
-	pub fn new() -> Particle<N>{
+impl<N: ArrayLength<f64>> Particle<N> {
+	pub fn new(
+			gmin_c: (crossbeam::Sender<(Vect::<N>,f64)>,crossbeam::Receiver<(Vect::<N>,f64)>),
+			state_r: bus::BusReader<(f64,f64,f64,bool)>,
+			opt_u_barrier:Option<Vect<N>>,opt_l_barrier:Option<Vect<N>>
+		) -> Particle<N>{
+		let mut rng = rand::thread_rng();
+		//calculate start position
+		let mut xi = Vect::<N>::new(0.0);
+		let mut u_barrier = Vect::<N>::new(f64::MAX);
+		let mut l_barrier = Vect::<N>::new(-f64::MAX);
+		if let Some(barrier) = opt_u_barrier{
+			u_barrier = barrier
+		}
+		if let Some(barrier) = opt_l_barrier{
+			l_barrier = barrier
+		}
+		for i in 0..N::to_usize(){
+			xi.v[i] = rng.gen_range(l_barrier.v[i], u_barrier.v[i])
+		}
 		Particle{
-			xi: xi_in,
-			vi: Vect::<N>::new(0.0),
-			loc_min: (Vect::<N>::new(0.0),f64::MAX),
-			gmin: gmin,
-			stop: stop,
-			sender: sender,
-			coeff: coeff,
+			xi: xi,																				//Position of, randomly in searchspace
+			vi: Vect::<N>::new(0.0),											//Speedvector
+			loc_min: (Vect::<N>::new(rng.gen()),f64::MAX),//Position and value of local minimum
+			gmin: (Vect::<N>::new(rng.gen()),f64::MAX),		//Position and value of global minimum
+			state: (1.0,0.5,0.5,false),										//state of the particle
+			gmin_c: gmin_c,																//Sender for possible global minimum
+			state_r: state_r,															//Receiver for state changes
 		}
 	}
 
 	pub fn work<F>(&mut self,fun:F,id:i64) where F:Fn(&Vect<N>) -> f64 {
-		println!("start Vector: {:?}:{:?}", id,self.xi);
 		loop{
+			//Update State
+			match self.state_r.recv() {
+				Ok(v) => self.state = v,
+				Err(_) => break,
+			}
+			//if stop break
+			if self.state.3 == true {break}
+			//check if new gmin
+			match self.gmin_c.1.recv(){
+				Ok(V) => self.gmin = V,
+				Err(_) => break,
+			}
 			let fx = fun(&self.xi);
 			//if fx < local min update local min
 			if fx < self.loc_min.1 {
 				self.loc_min = (self.xi.clone(),fx);
-				
 			}
 			//if fx < global min send new Value to global min
-			let mut val_gmin = f64::MAX;
-			let mut vec_gmin = Vect::new(0.0);
-			if let Ok(gmin) = self.gmin.read() {
-				val_gmin = gmin.1;
-				vec_gmin = gmin.0.clone();
+			if fx < self.gmin.1 {
+				match self.gmin_c.0.send((self.xi.clone(),fx)){
+					Ok(_)=> (),
+					Err(_)=> break,
+				}
 			}
-			if fx < val_gmin {
-				if let Ok(mut write_guard) = self.gmin.write() {
-					// the returned write_guard implements `Deref` giving us easy access to the target value
-					*write_guard = (self.vi.clone(),fx);
-					}
-			}
-			//sleep(Duration::from_millis(500));
+
 			//calculate new speed vector
-			let coeff = self.coeff.load();
-			self.vi = self.vi.clone().expand(coeff.0)+(self.loc_min.clone().0-self.xi.clone()).expand(coeff.1)+(vec_gmin.clone()-self.xi.clone()).expand(coeff.2);
+			self.vi = self.vi.clone().expand(self.state.0)+(self.loc_min.clone().0-self.xi.clone()).expand(self.state.1)+(self.gmin.0.clone()-self.xi.clone()).expand(self.state.2);
 			
 			//calculate new position
 			self.xi = self.xi.clone()+self.vi.clone();
-			//if stop, stop the run
-			if self.stop.load(Ordering::Relaxed) == true {break}
-			//send the distance of the particle to the main thread.Arc
-			let distance = (vec_gmin.clone()-self.xi.clone()).abs();
-			self.sender.send((id,distance));
 		}
 	}
 }
@@ -141,59 +182,16 @@ use crate::pso_mt::*;
 
 	#[test]
 	fn test_ctor(){
-		let swarm = Swarm::new();
-		let (sender, receiver) = mpsc::channel();
-
-		let _particle1 = Particle::new(Vect::<U3>::new(1.0),swarm.min.clone(),swarm.stop.clone(),sender.clone(),&swarm.coeff);
-		let _particle2 = Particle::new(Vect::<U3>::new(1.0),swarm.min.clone(),swarm.stop.clone(),sender.clone(),&swarm.coeff);
+		let mut _swarm;
+		match Swarm::<U2>::new(1.0,0.5,0.5,0.1,None,None) {
+			Ok(o) =>  _swarm = o,
+			Err(e) => println!("Error by building the swarm: {:?}",e),
+		}
 	}
-
 	#[test]
-	fn test_build_swarm(){
-		//Build global minimum storage
-		let swarm = Swarm::<U2>::new();
-		let (sender, receiver) = mpsc::channel();
-		const N_PARTICLES: i64 = 10;
-		const RTOL:f64 = 0.0001;
-		//Build swarm
-		println!("Build Swarm");
-		let mut threads = vec![];
-		for i in 0..N_PARTICLES{
-			let mut rng = rand::thread_rng();
-			let mut particle = Particle::new(Vect::<U2>::new(rng.gen()),swarm.min.clone(),swarm.stop.clone(),sender.clone(),&swarm.coeff);
-			threads.push(
-				thread::spawn(move || {
-					particle.work(rosenbrock,i);
-				})
-			)
-		}
-
-		//
-		println!("Start Loop");
-		let mut distances:Vec<f64> = vec![];
-		for i in 0..N_PARTICLES{
-			let n = N_PARTICLES as f64;
-			distances.push(f64::MAX/n);
-		}
-		loop{
-			let distance = receiver.recv().unwrap();
-			distances[distance.0 as usize] = distance.1;
-			let mut sum:f64 = distances.iter().sum();
-			sum /= N_PARTICLES as f64;
-			swarm.coeff.store((
-				1.0,
-				0.5,
-				0.5,
-			));
-			println!("sum of distances {}",sum);
-			if sum < RTOL {
-				swarm.stop.store(true, Ordering::Relaxed);
-				break;
-			}
-		}
-		for thread in threads{
-			thread.join();
-		}
-		println!("finish: {:?}",swarm.min);
+	fn test_s_build(){
+		let mut swarm = Swarm::<U2>::new(1.0,0.5,0.5,0.1,None,None).unwrap();
+		let solution = swarm.solve(rosenbrock,None,None);
+		println!("{:?}",solution)
 	}
 }
