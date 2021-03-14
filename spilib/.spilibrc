@@ -1,0 +1,4 @@
+PATH_BJT = ~/.spilib/bjt.lib
+PATH_DIODE = ~/.spilib/diode.lib
+PATH_JFET = ~/.spilib/jfet.lib
+PATH_MOSFET = ~/.spilib/mosfet.lib
