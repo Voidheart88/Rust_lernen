@@ -1,56 +1,94 @@
-use iced::{button, Button, Column, Element, Sandbox, Settings, Text};
+use iced::Length::Units;
+use iced::{button, slider, Align, Button, Column, Element, Sandbox, Settings, Slider, Text};
 
-pub fn main() {
-    Counter::run(Settings::default())
+pub fn main() -> iced::Result {
+    let mut settings = Settings::default();
+    settings.window.size = (300, 300);
+    settings.window.resizable = false;
+    Frontend::run(settings) //Starts the application
 }
 
 #[derive(Default)]
-struct Counter {
-    value: i32,
-    increment_button: button::State,
-    decrement_button: button::State,
+struct Frontend {
+    voltage: i32,
+    current: i32,
+    ok_button: button::State,
+    slider1: slider::State,
+    slider2: slider::State,
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    IncrementPressed,
-    DecrementPressed,
+    ButtonPressed,
+    Slider1Changed(i32),
+    Slider2Changed(i32),
 }
 
-impl Sandbox for Counter {
+impl Sandbox for Frontend {
     type Message = Message;
 
+    // Constructor
     fn new() -> Self {
-        Self::default()
+        let Frontend = Self::default();
+        return Frontend;
     }
 
+    // Set Title
     fn title(&self) -> String {
-        String::from("A simple counter")
+        String::from("Power Source")
     }
 
+    // Message Loop - handles state transition
     fn update(&mut self, message: Message) {
         match message {
-            Message::IncrementPressed => {
-                self.value += 1;
+            Message::ButtonPressed => {
+                self.voltage = 0;
+                self.current = 0;
             }
-            Message::DecrementPressed => {
-                self.value -= 1;
+            Message::Slider1Changed(v) => {
+                self.voltage = v;
+            }
+            Message::Slider2Changed(v) => {
+                self.current = v;
             }
         }
     }
-
+    // Build Application
     fn view(&mut self) -> Element<Message> {
-        Column::new()
+        let column: Element<Message> = Column::new() //Column Layout
             .padding(20)
+            .push(Slider::new(
+                &mut self.slider1,
+                0..=100,
+                self.voltage,
+                Message::Slider1Changed,
+            ))
             .push(
-                Button::new(&mut self.increment_button, Text::new("Increment"))
-                    .on_press(Message::IncrementPressed),
+                Text::new({
+                    let mut string = self.voltage.to_string();
+                    string.push_str(" V");
+                    string
+                })
+                .size(50),
             )
-            .push(Text::new(self.value.to_string()).size(50))
+            .push(Slider::new(
+                &mut self.slider2,
+                0..=100,
+                self.current,
+                Message::Slider2Changed,
+            ))
             .push(
-                Button::new(&mut self.decrement_button, Text::new("Decrement"))
-                    .on_press(Message::DecrementPressed),
+                Text::new({
+                    let mut string = self.current.to_string();
+                    string.push_str(" mA");
+                    string
+                })
+                .size(50),
             )
-            .into()
+            .push(
+                Button::new(&mut self.ok_button, Text::new("OK")).on_press(Message::ButtonPressed),
+            )
+            .into();
+        return column;
     }
 }
