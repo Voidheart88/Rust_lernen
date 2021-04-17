@@ -1,0 +1,11 @@
+libngspice.dll.a is the library for static linking of 
+msys2/mingw 64 bit libngspice-0.dll to other mingw
+programs
+
+ngspice.exp and ngspice.lib may be used for static 
+linking of Visual Studio ngspice-xx.dll with other VS
+programs.
+
+Folder ngspice contains the code model libraries for 
+both environments (made with MS VS 2019).  
+

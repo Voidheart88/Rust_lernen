@@ -1,0 +1,11 @@
+prefix=C:/Spice64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libngspice
+Description: General-purpose circuit simulator
+Version: 34
+Libs: -L${libdir} -lngspice
+Cflags: -I${includedir}
+
